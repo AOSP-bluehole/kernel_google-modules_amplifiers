@@ -1713,9 +1713,9 @@ static int drv2624_i2c_probe(struct i2c_client *client)
 	}
 
 	if (gpio_is_valid(drv2624->plat_data.gpio_nrst)) {
-		err = devm_gpio_request(&client->dev,
-					drv2624->plat_data.gpio_nrst,
-					"DRV2624-NRST");
+		err = devm_gpio_request_one(&client->dev, GPIOF_OUT_INIT_LOW,
+					    drv2624->plat_data.gpio_nrst,
+					    "DRV2624-NRST");
 		if (err < 0) {
 			dev_err(drv2624->dev,
 				"%s: GPIO %d request NRST error\n",
@@ -1723,7 +1723,7 @@ static int drv2624_i2c_probe(struct i2c_client *client)
 			return err;
 		}
 
-		gpio_direction_output(drv2624->plat_data.gpio_nrst, 0);
+		/* wait after GPIOF_OUT_INIT_LOW */
 		usleep_range(1000, 2000);
 		gpio_direction_output(drv2624->plat_data.gpio_nrst, 1);
 		usleep_range(1000, 2000); /* t(on) = 1ms */
@@ -1747,17 +1747,15 @@ static int drv2624_i2c_probe(struct i2c_client *client)
 	dev_init_platform_data(drv2624);
 
 	if (gpio_is_valid(drv2624->plat_data.gpio_int)) {
-		err = devm_gpio_request(&client->dev,
-					drv2624->plat_data.gpio_int,
-					"DRV2624-IRQ");
+		err = devm_gpio_request_one(&client->dev, GPIOF_IN,
+					    drv2624->plat_data.gpio_int,
+					    "DRV2624-IRQ");
 		if (err < 0) {
 			dev_err(drv2624->dev,
 				"%s: GPIO %d request INT error\n",
 				__func__, drv2624->plat_data.gpio_int);
 			goto drv2624_i2c_probe_err;
 		}
-
-		gpio_direction_input(drv2624->plat_data.gpio_int);
 
 		drv2624->irq = gpio_to_irq(drv2624->plat_data.gpio_int);
 		dev_dbg(drv2624->dev, "irq = %d\n", drv2624->irq);
