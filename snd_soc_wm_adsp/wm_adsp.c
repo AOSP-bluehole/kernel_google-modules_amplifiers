@@ -3163,7 +3163,7 @@ int wm_adsp2_preloader_put(struct snd_kcontrol *kcontrol,
 {
 	struct snd_soc_component *component = snd_kcontrol_chip(kcontrol);
 	struct wm_adsp *dsps = snd_soc_component_get_drvdata(component);
-	struct snd_soc_dapm_context *dapm = snd_soc_component_get_dapm(component);
+	struct snd_soc_dapm_context *dapm = snd_soc_component_to_dapm(component);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	struct wm_adsp *dsp = &dsps[mc->shift - 1];
@@ -3177,9 +3177,9 @@ int wm_adsp2_preloader_put(struct snd_kcontrol *kcontrol,
 			ucontrol->value.integer.value[0]);
 
 	if (ucontrol->value.integer.value[0] || dsp->toggle_preload)
-		snd_soc_component_force_enable_pin(component, preload);
+		snd_soc_dapm_force_enable_pin(dapm, preload);
 	else
-		snd_soc_component_disable_pin(component, preload);
+		snd_soc_dapm_disable_pin(dapm, preload);
 
 	snd_soc_dapm_sync(dapm);
 
@@ -3188,7 +3188,7 @@ int wm_adsp2_preloader_put(struct snd_kcontrol *kcontrol,
 	dsp->preloaded = ucontrol->value.integer.value[0];
 
 	if (dsp->toggle_preload) {
-		snd_soc_component_disable_pin(component, preload);
+		snd_soc_dapm_disable_pin(dapm, preload);
 		snd_soc_dapm_sync(dapm);
 	}
 
@@ -3384,11 +3384,12 @@ static void wm_halo_stop_core(struct wm_adsp *dsp)
 
 int wm_adsp2_component_probe(struct wm_adsp *dsp, struct snd_soc_component *component)
 {
+	struct snd_soc_dapm_context *dapm = snd_soc_component_to_dapm(component);
 	char preload[32];
 
 	//if (!dsp->no_preloader) {
 		snprintf(preload, ARRAY_SIZE(preload), "%s Preload", dsp->name);
-		snd_soc_component_disable_pin(component, preload);
+		snd_soc_dapm_disable_pin(dapm, preload);
 	//}
 
 	wm_adsp2_init_debugfs(dsp, component);
