@@ -10,8 +10,8 @@ obj-$(CONFIG_SND_SOC_CS35L41_I2C)	+= snd-soc-cs35l41-i2c.o
 KERNEL_SRC ?= /lib/modules/$(shell uname -r)/build
 M ?= $(shell pwd)
 
-EXTRA_CFLAGS += -I$(KERNEL_SRC)/$(M)/include/
-EXTRA_CFLAGS += -I$(KERNEL_SRC)/../private/google-modules/amplifiers/snd_soc_wm_adsp
+CFLAGS_MODULE += -I$(KERNEL_SRC)/$(M)/include/
+CFLAGS_MODULE += -I$(KERNEL_SRC)/../private/google-modules/amplifiers/snd_soc_wm_adsp
 EXTRA_SYMBOLS += $(OUT_DIR)/../private/google-modules/amplifiers/snd_soc_wm_adsp/Module.symvers
 
 KBUILD_OPTIONS += CONFIG_SND_SOC_CS35L41=m \
@@ -20,4 +20,4 @@ KBUILD_OPTIONS += CONFIG_SND_SOC_CS35L41=m \
 
 modules modules_install clean:
 	$(MAKE) -C $(KERNEL_SRC) M=$(M) W=1 \
-	$(KBUILD_OPTIONS) EXTRA_CFLAGS="$(EXTRA_CFLAGS)" KBUILD_EXTRA_SYMBOLS="$(EXTRA_SYMBOLS)" $(@)
+	$(KBUILD_OPTIONS) CFLAGS_MODULE="$(CFLAGS_MODULE)" KBUILD_EXTRA_SYMBOLS="$(EXTRA_SYMBOLS)" $(@)

@@ -14,7 +14,7 @@ obj-$(CONFIG_CS35L45_CS_DSP)		+= cs35l45-cs-dsp.o
 KERNEL_SRC ?= /lib/modules/$(shell uname -r)/build
 M ?= $(shell pwd)
 
-EXTRA_CFLAGS += -I$(KERNEL_SRC)/$(M)/include/
+CFLAGS_MODULE += -I$(KERNEL_SRC)/$(M)/include/
 
 KBUILD_OPTIONS += CONFIG_SND_SOC_CS35L45=m \
 		  CONFIG_SND_SOC_CS35L45_SPI=m \
@@ -24,4 +24,4 @@ KBUILD_OPTIONS += CONFIG_SND_SOC_CS35L45=m \
 
 modules modules_install clean:
 	$(MAKE) -C $(KERNEL_SRC) M=$(M) W=1 \
-	$(KBUILD_OPTIONS) EXTRA_CFLAGS="$(EXTRA_CFLAGS)" KBUILD_EXTRA_SYMBOLS="$(EXTRA_SYMBOLS)" $(@)
+	$(KBUILD_OPTIONS) CFLAGS_MODULE="$(CFLAGS_MODULE)" KBUILD_EXTRA_SYMBOLS="$(EXTRA_SYMBOLS)" $(@)
